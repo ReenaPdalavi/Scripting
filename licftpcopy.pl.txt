@@ -1,0 +1,56 @@
+#########################  Use this script for Windows side License Server	############
+#This script to be installed in path of VB Script on Remote Windows License Server for #uploading .dat files from C:\dpdtmp\dpddatfiles path to FTP.
+
+#!/usr/bin/perl
+
+ 
+
+use Net::FTP;
+my $ext		= '*.dat';
+
+$dat_file_path ='C:\dpdtmp\dpddatfiles';
+
+chdir($dat_file_path) or die "Cant chdir to $dat_file_path $!";
+
+###########		FTP Connectivity		###############
+    $ftp = Net::FTP->new("172.28.2.7", Debug => 0)
+
+      or die "Cannot connect to machine : $@";
+
+ 
+
+    $ftp->login("user_xfer",'user_xfer1')
+
+      or die "Cannot login ", $ftp->message;
+
+ 
+
+#    $ftp->cwd("/home/user_xfer/serverstat/db/cron_job_status")
+
+#      or die "Cannot change working directory ", $ftp->message;
+
+####################	Getting *.dat Files listing & uploading 	############# 
+####################  	Read Directory Contents				#############
+
+opendir (DIR,$dat_file_path) or die "Can't open directory $dat_file_path $!";
+my @file_list = readdir (DIR);
+closedir (DIR);
+
+####################	Upload Files to FTP				##############
+foreach $file_name (@file_list) {
+#### Next line for skipping . and .. special files
+next if ($file_name =~ m/^\./);
+
+
+    $ftp->put("$file_name");
+
+
+      #or die "get failed ", $ftp->message;
+}
+ 
+
+    $ftp->quit;
+
+
+
+ 
